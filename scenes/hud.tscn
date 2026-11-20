@@ -1,0 +1,133 @@
+[gd_scene format=3 uid="uid://d0ctubrxim8yr"]
+
+[ext_resource type="Script" uid="uid://bca60yfbmxw7h" path="res://scripts/hud.gd" id="1_oo0fn"]
+[ext_resource type="Texture2D" uid="uid://tje001hiw753" path="res://art/UI/weaponDisplay.png" id="2_047uy"]
+[ext_resource type="Texture2D" uid="uid://cgesbdv2uhf60" path="res://art/Player/Weapons/sword.png" id="3_5pdws"]
+[ext_resource type="Texture2D" uid="uid://cca2u8kvp8tu4" path="res://art/UI/holdItems.png" id="4_hd3ao"]
+[ext_resource type="Texture2D" uid="uid://csib6d0vs7wcc" path="res://art/Collectibles/Gold Coin.png" id="5_047uy"]
+[ext_resource type="Script" uid="uid://cijy8o8wuvm0j" path="res://scripts/element_energy.gd" id="5_hd3ao"]
+[ext_resource type="Texture2D" uid="uid://12rq62l5mgtj" path="res://art/Collectibles/Essence/Blue Essence.png" id="6_5pdws"]
+[ext_resource type="Script" uid="uid://blre4g2vw4m0f" path="res://scripts/element_wheel.gd" id="8_0i1j5"]
+
+[node name="Hud" type="CanvasLayer" unique_id=1960993164]
+script = ExtResource("1_oo0fn")
+
+[node name="LeftHud" type="Control" parent="." unique_id=899682624]
+layout_mode = 3
+anchors_preset = 0
+
+[node name="WeaponDisplay" type="TextureRect" parent="LeftHud" unique_id=1186030058]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 6.0
+offset_right = 103.0
+offset_bottom = 70.0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("2_047uy")
+
+[node name="WeaponIcon" type="TextureRect" parent="LeftHud" unique_id=2008244099]
+layout_mode = 0
+offset_left = 14.0
+offset_top = 11.0
+offset_right = 30.0
+offset_bottom = 33.0
+texture = ExtResource("3_5pdws")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="LivesLabel" type="Label" parent="LeftHud" unique_id=2090050369]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 7.0
+offset_right = 113.0
+offset_bottom = 30.0
+theme_override_font_sizes/font_size = 8
+text = "HUD_LIVES"
+
+[node name="Hearts" type="HBoxContainer" parent="LeftHud" unique_id=1711088627]
+layout_mode = 0
+offset_left = 60.0
+offset_top = 20.0
+offset_right = 60.0
+offset_bottom = 20.0
+scale = Vector2(2, 2)
+theme_override_constants/separation = 1
+
+[node name="ItemHolder" type="TextureRect" parent="LeftHud" unique_id=688999183]
+layout_mode = 0
+offset_left = 6.0
+offset_top = 53.0
+offset_right = 186.0
+offset_bottom = 101.0
+scale = Vector2(0.5, 0.5)
+texture = ExtResource("4_hd3ao")
+
+[node name="ElementEnergy" type="Control" parent="LeftHud" unique_id=1574992121]
+anchors_preset = 0
+offset_left = 60.0
+offset_top = 40.0
+offset_right = 60.0
+offset_bottom = 40.0
+script = ExtResource("5_hd3ao")
+
+[node name="RightHud" type="Control" parent="." unique_id=1720986379]
+layout_mode = 3
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -62.0
+offset_top = 20.0
+offset_right = -14.0
+offset_bottom = 70.0
+
+[node name="Rows" type="VBoxContainer" parent="RightHud" unique_id=1787704543]
+layout_mode = 0
+theme_override_constants/separation = 3
+
+[node name="CoinRow" type="HBoxContainer" parent="RightHud/Rows" unique_id=1518202837]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CoinIcon" type="TextureRect" parent="RightHud/Rows/CoinRow" unique_id=1391404140]
+custom_minimum_size = Vector2(18, 16)
+layout_mode = 2
+texture = ExtResource("5_047uy")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CoinLabel" type="Label" parent="RightHud/Rows/CoinRow" unique_id=600233011]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+
+[node name="CrystalRow" type="HBoxContainer" parent="RightHud/Rows" unique_id=2018461559]
+layout_mode = 2
+theme_override_constants/separation = 6
+
+[node name="CrystalIcon" type="TextureRect" parent="RightHud/Rows/CrystalRow" unique_id=491628039]
+custom_minimum_size = Vector2(18, 18)
+layout_mode = 2
+texture = ExtResource("6_5pdws")
+expand_mode = 1
+stretch_mode = 5
+
+[node name="CrystalLabel" type="Label" parent="RightHud/Rows/CrystalRow" unique_id=1742201521]
+layout_mode = 2
+theme_override_font_sizes/font_size = 12
+
+[node name="ElementWheel" type="Control" parent="." unique_id=1907465347]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("8_0i1j5")
+
+[node name="NameLabel" type="Label" parent="ElementWheel" unique_id=1324671410]
+layout_mode = 0
+offset_left = 280.0
+offset_top = 104.0
+offset_right = 360.0
+offset_bottom = 127.0
+theme_override_font_sizes/font_size = 8
+horizontal_alignment = 1

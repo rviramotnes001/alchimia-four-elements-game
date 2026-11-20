@@ -1,0 +1,8 @@
+# Godot 4+ specific ignores
+.godot/
+/android/
+
+# macOS / respaldos
+.DS_Store
+_old_rooms/
+_old_rooms2/

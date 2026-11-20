@@ -1,0 +1,124 @@
+[gd_scene format=3 uid="uid://rrb04lgxpe22"]
+
+[ext_resource type="PackedScene" uid="uid://bh6ssr004acfh" path="res://scenes/player.tscn" id="1_2venv"]
+[ext_resource type="PackedScene" uid="uid://d0wifyub4pegj" path="res://scenes/training_dummy.tscn" id="2_paw1w"]
+[ext_resource type="PackedScene" uid="uid://d0ctubrxim8yr" path="res://scenes/hud.tscn" id="3_x4b8f"]
+[ext_resource type="PackedScene" uid="uid://di8xavhbkadj0" path="res://scenes/hazard.tscn" id="4_tmr53"]
+[ext_resource type="PackedScene" path="res://scenes/gate.tscn" id="5_88ety"]
+[ext_resource type="PackedScene" path="res://scenes/water_switch.tscn" id="6_ahbqi"]
+[ext_resource type="PackedScene" path="res://scenes/elemental_torch.tscn" id="7_7gix3"]
+[ext_resource type="PackedScene" path="res://scenes/water_zone.tscn" id="8_ahbqi"]
+[ext_resource type="PackedScene" path="res://scenes/irrigation_point.tscn" id="9_7gix3"]
+[ext_resource type="PackedScene" path="res://scenes/enemy_slime.tscn" id="10_slime"]
+[ext_resource type="PackedScene" path="res://scenes/enemy_boar.tscn" id="11_boar"]
+[ext_resource type="PackedScene" path="res://scenes/enemy_bat.tscn" id="12_bat"]
+[ext_resource type="PackedScene" path="res://scenes/enemy_satyr.tscn" id="13_sat"]
+[ext_resource type="PackedScene" path="res://scenes/enemy_mandrake.tscn" id="14_man"]
+[ext_resource type="PackedScene" path="res://scenes/enemy_water.tscn" id="15_wat"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_paw1w"]
+size = Vector2(2000, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_j6w7d"]
+size = Vector2(160, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_x4b8f"]
+size = Vector2(160, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_tmr53"]
+size = Vector2(160, 20)
+
+[node name="TestLevel" type="Node2D" unique_id=1618002890]
+
+[node name="Floor" type="StaticBody2D" parent="." unique_id=1489758030]
+position = Vector2(0, 100)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor" unique_id=384015681]
+shape = SubResource("RectangleShape2D_paw1w")
+
+[node name="Visual" type="Polygon2D" parent="Floor" unique_id=1047713054]
+color = Color(0.29, 0.29, 0.35, 1)
+polygon = PackedVector2Array(-1000, -20, 1000, -20, 1000, 20, -1000, 20)
+
+[node name="Platform1" type="StaticBody2D" parent="." unique_id=1855809719]
+position = Vector2(250, 10)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform1" unique_id=716893510]
+shape = SubResource("RectangleShape2D_j6w7d")
+
+[node name="Visual" type="Polygon2D" parent="Platform1" unique_id=1471840097]
+color = Color(0.42, 0.42, 0.48, 1)
+polygon = PackedVector2Array(-80, -10, 80, -10, 80, 10, -80, 10)
+
+[node name="Platform2" type="StaticBody2D" parent="." unique_id=1503139867]
+position = Vector2(480, -70)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform2" unique_id=1238538713]
+shape = SubResource("RectangleShape2D_x4b8f")
+
+[node name="Visual" type="Polygon2D" parent="Platform2" unique_id=595290357]
+color = Color(0.42, 0.42, 0.48, 1)
+polygon = PackedVector2Array(-80, -10, 80, -10, 80, 10, -80, 10)
+
+[node name="Platform3" type="StaticBody2D" parent="." unique_id=1227558792]
+position = Vector2(710, -150)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platform3" unique_id=254579026]
+shape = SubResource("RectangleShape2D_tmr53")
+
+[node name="Visual" type="Polygon2D" parent="Platform3" unique_id=71268260]
+color = Color(0.42, 0.42, 0.48, 1)
+polygon = PackedVector2Array(-80, -10, 80, -10, 80, 10, -80, 10)
+
+[node name="Player" parent="." unique_id=1497529898 instance=ExtResource("1_2venv")]
+position = Vector2(0, 80)
+
+[node name="Dummy1" parent="." unique_id=528440794 instance=ExtResource("2_paw1w")]
+position = Vector2(90, 80)
+
+[node name="Dummy2" parent="." unique_id=670926807 instance=ExtResource("2_paw1w")]
+position = Vector2(-110, 80)
+
+[node name="Hud" parent="." unique_id=1960993164 instance=ExtResource("3_x4b8f")]
+
+[node name="Spikes" parent="." unique_id=1963978994 instance=ExtResource("4_tmr53")]
+position = Vector2(-50, 80)
+
+[node name="Gate1" parent="." unique_id=1967236996 instance=ExtResource("5_88ety")]
+position = Vector2(330, 80)
+
+[node name="Gate2" parent="." unique_id=784002629 instance=ExtResource("5_88ety")]
+position = Vector2(420, 80)
+
+[node name="WaterSwitch1" parent="." unique_id=166677199 instance=ExtResource("6_ahbqi")]
+position = Vector2(190, 80)
+targets = Array[NodePath]([NodePath("../Gate1")])
+
+[node name="Torch1" parent="." unique_id=1157389960 instance=ExtResource("7_7gix3")]
+position = Vector2(360, 80)
+targets = Array[NodePath]([NodePath("../Gate2")])
+
+[node name="Pool" parent="." unique_id=489159038 instance=ExtResource("8_ahbqi")]
+z_index = 10
+position = Vector2(-320, 50)
+
+[node name="Irrigation1" parent="." unique_id=778055295 instance=ExtResource("9_7gix3")]
+position = Vector2(140, 80)
+
+[node name="Slime" parent="." instance=ExtResource("10_slime")]
+position = Vector2(-400, 80)
+
+[node name="Boar" parent="." instance=ExtResource("11_boar")]
+position = Vector2(-790, 80)
+
+[node name="Bat" parent="." instance=ExtResource("12_bat")]
+position = Vector2(-880, 20)
+
+[node name="Satyr" parent="." instance=ExtResource("13_sat")]
+position = Vector2(-500, 80)
+
+[node name="Mandrake" parent="." instance=ExtResource("14_man")]
+position = Vector2(-600, 80)
+
+[node name="Water" parent="." instance=ExtResource("15_wat")]
+position = Vector2(-690, 80)

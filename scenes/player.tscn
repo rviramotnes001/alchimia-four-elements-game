@@ -1,0 +1,49 @@
+[gd_scene format=3 uid="uid://bh6ssr004acfh"]
+
+[ext_resource type="Script" uid="uid://bi5ugsxwf0p5q" path="res://scripts/player.gd" id="1_3vyb7"]
+[ext_resource type="SpriteFrames" uid="uid://hxm57n4rtdwx" path="res://art/Player/erek_frames.tres" id="2_g2els"]
+[ext_resource type="Script" uid="uid://bw7i3sa1yj71a" path="res://scripts/elemental_power.gd" id="3_qhqgy"]
+[ext_resource type="Script" uid="uid://rahdv7g5lokf" path="res://scripts/oxygen_meter.gd" id="4_dqkch"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_qhqgy"]
+size = Vector2(8, 28)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
+size = Vector2(26, 30)
+
+[node name="Player" type="CharacterBody2D" unique_id=1497529898]
+collision_layer = 2
+script = ExtResource("1_3vyb7")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1607308374]
+position = Vector2(0, -14)
+shape = SubResource("RectangleShape2D_qhqgy")
+
+[node name="Camera2D" type="Camera2D" parent="." unique_id=1934111180]
+position = Vector2(0, -20)
+
+[node name="Visual" type="Node2D" parent="." unique_id=1966935579]
+
+[node name="Sprite" type="AnimatedSprite2D" parent="Visual" unique_id=1233251427]
+position = Vector2(8, -18)
+sprite_frames = ExtResource("2_g2els")
+animation = &"idle"
+
+[node name="SwordHitbox" type="Area2D" parent="." unique_id=1155428572]
+position = Vector2(17, 0)
+collision_layer = 8
+collision_mask = 16
+monitoring = false
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="SwordHitbox" unique_id=1381837642]
+position = Vector2(0, -19)
+shape = SubResource("RectangleShape2D_g2els")
+
+[node name="Elemental" type="Node" parent="." unique_id=1121088527]
+script = ExtResource("3_qhqgy")
+
+[node name="OxygenMeter" type="Node2D" parent="." unique_id=1775829083]
+z_index = 20
+position = Vector2(0, -42)
+script = ExtResource("4_dqkch")

@@ -1,0 +1,29 @@
+[gd_scene format=3]
+
+[ext_resource type="Script" path="res://scripts/water_switch.gd" id="1_s"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_s"]
+size = Vector2(14, 14)
+
+[node name="WaterSwitch" type="Node2D"]
+script = ExtResource("1_s")
+
+[node name="Base" type="Polygon2D" parent="."]
+color = Color(0.42, 0.42, 0.48, 1)
+polygon = PackedVector2Array(-6, 0, -6, -6, 6, -6, 6, 0)
+
+[node name="Stem" type="Polygon2D" parent="."]
+color = Color(0.3, 0.3, 0.36, 1)
+polygon = PackedVector2Array(-2, -6, -2, -12, 2, -12, 2, -6)
+
+[node name="Lamp" type="Polygon2D" parent="."]
+color = Color(0.23, 0.23, 0.28, 1)
+polygon = PackedVector2Array(-5, -12, -5, -18, 5, -18, 5, -12)
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0, -10)
+shape = SubResource("RectangleShape2D_s")

@@ -1,0 +1,36 @@
+[gd_scene format=3 uid="uid://d0wifyub4pegj"]
+
+[ext_resource type="Script" uid="uid://cmb228hyb8ov0" path="res://scripts/training_dummy.gd" id="1_v6s2v"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_jt8kp"]
+size = Vector2(14, 28)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_np7qd"]
+size = Vector2(16, 30)
+
+[node name="TrainingDummy" type="CharacterBody2D" unique_id=528440794]
+collision_layer = 4
+script = ExtResource("1_v6s2v")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="." unique_id=1946430316]
+position = Vector2(0, -14)
+shape = SubResource("RectangleShape2D_jt8kp")
+
+[node name="Visual" type="Polygon2D" parent="." unique_id=167782125]
+color = Color(0.85, 0.55, 0.25, 1)
+polygon = PackedVector2Array(-7, -28, 7, -28, 7, 0, -7, 0)
+
+[node name="Label" type="Label" parent="." unique_id=168496102]
+offset_left = -10.0
+offset_top = -46.0
+offset_right = -9.0
+offset_bottom = -23.0
+scale = Vector2(0.5, 0.5)
+
+[node name="Hurtbox" type="Area2D" parent="." unique_id=461595241]
+collision_layer = 16
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox" unique_id=685785219]
+position = Vector2(0, -15)
+shape = SubResource("RectangleShape2D_np7qd")

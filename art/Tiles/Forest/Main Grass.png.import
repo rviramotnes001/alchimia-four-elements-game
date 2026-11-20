@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://ciqqh84ugrecy"
-path="res://.godot/imported/Most Cave.png-24bec72dd80af6bfc5270c9f2e3e3713.ctex"
+uid="uid://bwwf8vndrlu70"
+path="res://.godot/imported/Main Grass.png-0a4b59ca505c5ccb1ab62e62ae235cb4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/Tiles /Forest/Most Cave.png"
-dest_files=["res://.godot/imported/Most Cave.png-24bec72dd80af6bfc5270c9f2e3e3713.ctex"]
+source_file="res://art/Tiles/Forest/Main Grass.png"
+dest_files=["res://.godot/imported/Main Grass.png-0a4b59ca505c5ccb1ab62e62ae235cb4.ctex"]
 
 [params]
 

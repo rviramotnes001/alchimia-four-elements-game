@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dct33ysnuh7y3"
-path="res://.godot/imported/Olla Pequeña Cafe .png-10a7298366cbe101fb863c1ee8162626.ctex"
+path="res://.godot/imported/Olla Pequena Cafe.png-10a7298366cbe101fb863c1ee8162626.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/Collectibles/Olla Pequeña Cafe .png"
-dest_files=["res://.godot/imported/Olla Pequeña Cafe .png-10a7298366cbe101fb863c1ee8162626.ctex"]
+source_file="res://art/Collectibles/Olla Pequena Cafe.png"
+dest_files=["res://.godot/imported/Olla Pequena Cafe.png-10a7298366cbe101fb863c1ee8162626.ctex"]
 
 [params]
 

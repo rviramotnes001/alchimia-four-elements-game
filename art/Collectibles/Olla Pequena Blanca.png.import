@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cy5ir7c4pxafg"
-path="res://.godot/imported/Olla Pequeña Blanca.png-14bdb667807f85da85655a895a9c00c6.ctex"
+path="res://.godot/imported/Olla Pequena Blanca.png-14bdb667807f85da85655a895a9c00c6.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://art/Collectibles/Olla Pequeña Blanca.png"
-dest_files=["res://.godot/imported/Olla Pequeña Blanca.png-14bdb667807f85da85655a895a9c00c6.ctex"]
+source_file="res://art/Collectibles/Olla Pequena Blanca.png"
+dest_files=["res://.godot/imported/Olla Pequena Blanca.png-14bdb667807f85da85655a895a9c00c6.ctex"]
 
 [params]
 

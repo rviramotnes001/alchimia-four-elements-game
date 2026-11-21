@@ -28,6 +28,10 @@ signal died
 @export var patrol_walk_time := Vector2(2.5, 4.5)
 ## Tiempo detenido en idle antes de seguir patrullando.
 @export var patrol_pause_time := Vector2(0.8, 1.6)
+## Zona de patrulla: radio en px alrededor de su punto de origen (donde lo colocas en la sala). Da la vuelta
+## al llegar al límite, en paredes, bordes y al empezar una pendiente (patrulla solo en plano). 0 = sin límite.
+## Si algo lo saca de la zona (persecución, golpe), vuelve a ella antes de seguir patrullando.
+@export var patrol_radius: float = 56.0
 @export_group("Pisotón")
 @export var stompable: bool = false
 ## Fuerza del rebote del jugador (salto normal = 320). Con el botón de salto sube más.
@@ -57,6 +61,7 @@ var _time := 0.0
 var _pause_left := 0.0
 var _walk_left := 0.0
 var _player_y_hist: Array[float] = []
+var _home_x := 0.0
 
 var visual: Node2D
 var hurtbox: Area2D
@@ -71,15 +76,27 @@ var _body_shape: CollisionShape2D
 func _ready() -> void:
 	collision_layer = 4
 	collision_mask = 1
+	# Pendientes de 45° exactos cuentan como suelo (con el límite por defecto se tratan como pared
+	# y el enemigo se queda trabado), y el imán al suelo lo pega al bajar.
+	floor_max_angle = deg_to_rad(50.0)
+	floor_snap_length = 10.0
 	_setup()
+	if not _uses_gravity():
+		floor_snap_length = 0.0  # voladores: nada de imán al suelo
 	health = max_health
 	_build_body()
 	if Engine.is_editor_hint():
 		return  # en el editor solo se dibuja para poder colocarlo
+	_home_x = global_position.x
 	_update_label()
 
 
 func _build_body() -> void:
+	# El cuerpo se construye siempre por código. Si la escena trae hijos viejos (p. ej. al duplicar un enemigo en
+	# el editor se guardan los hijos creados en tiempo de ejecución y salía un sprite doble), se descartan.
+	for old in get_children():
+		remove_child(old)
+		old.queue_free()
 	var half := body_size / 2.0
 	_body_shape = CollisionShape2D.new()
 	_body_shape.shape = RectangleShape2D.new()
@@ -390,10 +407,38 @@ func dy_to_player() -> float:
 
 ## ¿Hay suelo un paso adelante? (para no caerse de las plataformas)
 func ground_ahead(step: float = 10.0) -> bool:
+	return not is_inf(ground_y_ahead(step))
+
+
+## ¿Debe dar la vuelta una patrulla? Llamar solo mientras patrulla (no persiguiendo): pared, borde, límite de la
+## zona de patrulla o comienzo de una pendiente/escalón (la patrulla es siempre en plano, caminar inclinado se ve raro).
+func patrol_should_turn(step: float = 10.0) -> bool:
+	if not is_on_floor():
+		return false
+	var dx := global_position.x - _home_x
+	if patrol_radius > 0.0 and absf(dx) > patrol_radius:
+		facing = -1 if dx > 0.0 else 1  # fuera de la zona: regresa a casa (puede cruzar pendientes)
+		return false
+	if is_on_wall():
+		return true
+	var gy := ground_y_ahead(step)
+	if is_inf(gy) or absf(gy - global_position.y) > 3.0:
+		return true
+	return patrol_radius > 0.0 and dx * facing >= patrol_radius
+
+
+## Altura (y global) del suelo un paso adelante, o INF si no hay.
+func ground_y_ahead(step: float = 10.0) -> float:
 	var space := get_world_2d().direct_space_state
-	var from := global_position + Vector2(facing * (body_size.x / 2.0 + step), -2.0)
-	var q := PhysicsRayQueryParameters2D.create(from, from + Vector2(0, 14.0), 1)
-	return not space.intersect_ray(q).is_empty()
+	# El rayo arranca 12 px arriba de los pies: en una subida el suelo de adelante es más alto
+	# y, si arrancara dentro del tile, no detectaría nada (el enemigo daría media vuelta sin razón).
+	var from := global_position + Vector2(facing * (body_size.x / 2.0 + step), -12.0)
+	# Llega 28 px por debajo de los pies: alcanza para bajar una pendiente de 45° (la colisión de las pendientes
+	# está bajada ~5 px y la caída a un paso adelante es de 14-20 px) y sigue tratando un precipicio de 2+ tiles
+	# (32 px) como borde.
+	var q := PhysicsRayQueryParameters2D.create(from, from + Vector2(0, 40.0), 1)
+	var hit := space.intersect_ray(q)
+	return INF if hit.is_empty() else hit.position.y
 
 
 func _update_label() -> void:

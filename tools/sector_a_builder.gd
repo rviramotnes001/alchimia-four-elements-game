@@ -10,6 +10,7 @@ extends RefCounted
 ## planos donde cabe entera.
 
 const TILE := 16
+## TileSet por defecto (el del bosque). Cada spec puede traer su propio "tileset" para otros capítulos.
 const TILESET := "res://tiles/forest_tileset.tres"
 const DUMMY := "res://scenes/training_dummy.tscn"
 ## Tipos de enemigo para el spec "enemies": {"k": tipo, "x": tile, "row": fila de suelo opcional,
@@ -22,6 +23,9 @@ const ENEMY_SCENES := {
 const DECOR_DIR := "res://art/Decorations/"
 ## Extensión del terreno fuera de la sala, para que no se caiga al cruzar la salida.
 const OVERSCAN := 2
+## Capas "detrás del suelo": z (bajo el suelo y los props de medio plano) y tinte para dar profundidad.
+const BACK_Z := -3
+const BACK_TINT := Color(0.7, 0.78, 0.82)
 
 ## [archivo, ancho, última fila opaca]
 const SMALL := [["Small Plant", 32, 26], ["Red Flowers", 30, 28], ["Blue Flowers", 23, 31],
@@ -52,63 +56,114 @@ static func specs() -> Array:
 	return [
 		{
 			# A1 · Claro de entrada: un sendero tranquilo bajo sauces, con un cartel, un cerco y una roca elemental al fondo.
-			"id": &"a1", "title": "ROOM_A1", "cols": 80, "rows": 24, "base": 19,
-			"segments": [], "decor": false,
-			"profile": [F.call(18), R.call(1), F.call(14), R.call(1), F.call(10), D.call(1), F.call(8), D.call(1), F.call(28)],
-			"platforms": [],
+			"id": &"a1", "title": "ROOM_A1", "cols": 80, "rows": 24, "base": 20,
+			"segments": [], "decor": false, "bg": true,
+			# Camino que sube a una loma, baja a una hondonada y vuelve a subir hasta la salida.
+			"profile": [F.call(12), U.call(4), F.call(10), Dn.call(4), F.call(6), Dn.call(2), F.call(1), R.call(3), F.call(3), D.call(3), F.call(2), U.call(2),
+					F.call(8), R.call(1), F.call(6), U.call(2), F.call(24)],
+			# Una meseta de roca que nace del suelo de la hondonada (3 tiles de alto, se salta desde el piso) y,
+			# encima, dos plataformas finas flotando en escalera (cada paso sube 2 tiles; el salto llega a ~3.5).
+			"platforms": [[41, 17, 3, 1], [45, 15, 3, 1]],
 			"pillars": [],
 			"spawns": {"default": 4, "right": 76},
 			"exits": [{"side": RoomExit.ExitSide.RIGHT, "room": &"a2", "spawn": &"left"}],
-			"enemies": [{"k": "Rat", "x": 22}, {"k": "Gota", "x": 47}, {"k": "Rat", "x": 66}],
+			"enemies": [{"k": "Rat", "x": 21}, {"k": "Rat", "x": 47}],
 			"dummies": [],
 			"fixed": [],
 			"props": [
-				P.call("sign_text", 6), P.call("Fence", 9.5),
-				T.call("willow_l", 2, 26, "m"), P.call("Red Flowers", 23.5), P.call("Small Plant", 29),
-				T.call("round_l", 0, 48, "m"), P.call("Tronco", 43.5),
-				P.call("Horn Light", 62), P.call("Big Element Rock", 66, "m", true), P.call("Bigger Light", 74),
+				# Entrada: cartel y cerco, un arbusto y flores.
+				P.call("sign_text", 2.5), P.call("Fence", 6.5, "m"),
+				# Árboles lejanos para dar profundidad (entre el fondo y el sendero).
+				T.call("round_l", 0, 0, "b", DIM), T.call("pine_l", 0, 33, "b", DIM), T.call("round_l", 0, 56, "b", DIM),
+				# La loma: un sauce protagonista con flores y un tronco caído al pie.
+				T.call("willow_l", 0, 22, "m"), P.call("Red Flowers", 18.5, "f"), P.call("Tronco", 32.5, "m"),
+				# Hondonada: flores y roca pequeña.
+				P.call("Blue Flowers", 38, "f"), P.call("Orange Flowers", 48, "f"),
+				P.call("Small Plant", 52, "f"),
+				# Último tramo: un árbol redondo, la roca elemental y faroles hacia la salida.
+				T.call("round_l", 1, 65, "m"), P.call("Horn Light", 53.5), P.call("Big Element Rock", 71, "m", true),
+				P.call("Bigger Light", 76),
 			],
 		},
 		{
 			# A2 · Altar del bosque: un pequeño santuario de ruinas y reliquias en el centro, rodeado de coníferas rojas y moradas.
-			"id": &"a2", "title": "ROOM_A2", "cols": 80, "rows": 24, "base": 19,
-			"segments": [], "decor": false,
-			"profile": [F.call(16), R.call(1), F.call(12), D.call(1), F.call(10), R.call(1), F.call(6), R.call(1), F.call(10), D.call(1), F.call(8), D.call(1), F.call(22)],
-			"platforms": [],
+			"id": &"a2", "title": "ROOM_A2", "cols": 80, "rows": 24, "base": 20,
+			"segments": [], "decor": false, "bg": true,
+			# Se entra por abajo, se sube en dos pasos a la meseta del altar (fila 17), se baja a dos arenas
+			# de combate (filas 19 y 21) y se sube de nuevo hasta la salida. Columnas = tramo + 2 (el perfil empieza en -2).
+			"profile": [F.call(8), R.call(1), F.call(6), U.call(2), F.call(18), Dn.call(2), F.call(6), Dn.call(2), F.call(8),
+					U.call(4), F.call(28)],
+			"platforms": [[47, 17, 3, 1]],
 			"pillars": [],
+			# Detrás de la meseta del altar: un risco en dos escalones (se sube desde la meseta) y,
+			# detrás de la arena baja, un saliente.
+			"back": [
+				{"x0": 16, "row0": 15, "segs": [F.call(5), R.call(2), F.call(7)], "bottom": 17},
+				{"x0": 43, "row0": 19, "segs": [F.call(5)], "bottom": 21},
+			],
+			"platforms_back": [[29, 13, 3, 1]],
 			"spawns": {"default": 4, "left": 3, "right": 76},
 			"exits": [
 				{"side": RoomExit.ExitSide.LEFT, "room": &"a1", "spawn": &"right"},
 				{"side": RoomExit.ExitSide.RIGHT, "room": &"a3", "spawn": &"left"},
 			],
-			"enemies": [{"k": "Satyr", "x": 24}, {"k": "Mandrake", "x": 34}, {"k": "Wasp", "x": 42, "air": 6}, {"k": "Wolf", "x": 66}],
+			# Sector A es tranquilo: 3 encuentros. La mandrágora guarda el altar, una rata en la arena baja y otra en el tramo final.
+			"enemies": [{"k": "Mandrake", "x": 26}, {"k": "Rat", "x": 44}, {"k": "Rat", "x": 62}],
 			"dummies": [],
 			"fixed": [],
 			"props": [
-				P.call("Tall Sign", 5),
-				T.call("willow_l", 1, 17, "m"), P.call("Orange Flowers", 14),
-				P.call("Horn Light", 36), P.call("Yellow Reliquia", 38), P.call("Big Element Rock Not Filled", 42),
-				P.call("Blue Reliquia", 46), P.call("Horn Light", 48),
-				T.call("pine_l", 2, 60, "m"), P.call("Big Rock", 64, "m", true), P.call("Bigger Light", 74),
+				# Entrada: letrero, un sauce y flores.
+				P.call("Tall Sign", 2.5), T.call("willow_l", 1, 8.5, "m"), P.call("Orange Flowers", 5),
+				# Árboles lejanos entre el fondo y el sendero.
+				T.call("pine_l", 0, 12, "b", DIM), T.call("round_l", 0, 38, "b", DIM), T.call("pine_l", 0, 58, "b", DIM),
+				# La meseta del altar: faroles, reliquias y la roca elemental vacía en el centro.
+				P.call("Horn Light", 18), P.call("Yellow Reliquia", 21), P.call("Big Element Rock Not Filled", 24),
+				P.call("Blue Reliquia", 27), P.call("Horn Light", 30),
+				# Bajada: tronco caído y flores.
+				P.call("Tronco", 36.5, "m"), P.call("Red Flowers", 39, "f"),
+				P.call("Small Rock", 43, "f"), P.call("Blue Flowers", 48, "f"),
+				# Tramo final: conífera, roca y farol hacia la salida.
+				T.call("pine_l", 2, 60, "m"), P.call("Big Rock", 66, "m", true), P.call("Small Plant", 70, "f"),
+				P.call("Bigger Light", 77),
 			],
 		},
 		{
 			# A3 · La ladera: seis terrazas amplias que suben el bosque, cada una con su árbol; en la cima, un mirador.
 			"id": &"a3", "title": "ROOM_A3", "cols": 64, "rows": 40, "base": 35,
-			"segments": [], "decor": false,
-			"profile": [F.call(14), R.call(3), F.call(8), R.call(3), F.call(8), R.call(3), F.call(8), R.call(3), F.call(8), R.call(3), F.call(8), R.call(3), F.call(10)],
+			"segments": [], "decor": false, "bg": true,
+			# La ladera: sube de la fila 35 a la 13 alternando pendientes de 45° y escalones de 2 tiles.
+			# Columnas = tramo + 2 (el perfil empieza en -2).
+			"profile": [F.call(8), U.call(4), F.call(6), R.call(2), F.call(4), U.call(4), F.call(6), R.call(2), F.call(5),
+					U.call(4), F.call(6), R.call(2), F.call(5), U.call(4), F.call(12)],
 			"platforms": [],
 			"pillars": [],
+			# Salientes detrás de cada terraza: ruta alterna que se sube saltando (2 tiles sobre el suelo).
+			"back": [
+				{"x0": 12, "row0": 29, "segs": [F.call(4)], "bottom": 31},
+				{"x0": 26, "row0": 23, "segs": [F.call(4)], "bottom": 25},
+				{"x0": 41, "row0": 17, "segs": [F.call(4)], "bottom": 19},
+				{"x0": 55, "row0": 11, "segs": [F.call(7)], "bottom": 13},
+			],
+			"platforms_back": [[17, 27, 3, 1], [32, 21, 3, 1]],
 			"spawns": {"default": 4, "left": 3, "right": 60},
 			"exits": [{"side": RoomExit.ExitSide.LEFT, "room": &"a2", "spawn": &"right"}],
-			"enemies": [{"k": "Satyr", "x": 20}, {"k": "Mandrake", "x": 31}, {"k": "Wasp", "x": 42, "air": 5}, {"k": "Wolf", "x": 58}],
+			# 3 encuentros repartidos en la subida: una rata abajo, una mandrágora emboscada en la terraza media y una rata cerca de la cima.
+			"enemies": [{"k": "Rat", "x": 14}, {"k": "Mandrake", "x": 30}, {"k": "Rat", "x": 48}],
 			"dummies": [],
 			"fixed": [],
 			"props": [
-				P.call("sign_no_text", 5), T.call("willow_l", 2, 9, "m"),
-				T.call("round_l", 3, 31, "m"), P.call("Tronco", 27.5),
-				T.call("round_l", 1, 50, "m"),
-				P.call("Small Element Rock", 57), P.call("Horn Light", 59), P.call("Bigger Light", 61),
+				# Pie de la ladera.
+				P.call("sign_no_text", 2.5), T.call("willow_l", 2, 4.5, "m"), P.call("Blue Flowers", 7, "f"),
+				# Árboles lejanos para dar profundidad.
+				T.call("round_l", 0, 20, "b", DIM), T.call("pine_l", 0, 44, "b", DIM), T.call("round_l", 0, 8, "b", DIM),
+				# Terrazas: cada una con su rincón.
+				P.call("Tronco", 13, "m"), P.call("Orange Flowers", 16, "f"),
+				T.call("round_l", 3, 27, "m"), P.call("Small Rock", 24.5, "f"),
+				P.call("Pink Tall Flower", 43.5, "f"),
+				T.call("pine_l", 2, 41, "m"), P.call("Small Plant", 46, "f"),
+				T.call("round_l", 1, 49, "m"),
+				# Cima: mirador con la roca elemental y los faroles.
+				P.call("Small Element Rock", 57), P.call("Horn Light", 59), P.call("Bigger Light", 62),
 			],
 		},
 	]
@@ -157,7 +212,7 @@ static func build_room(tree: SceneTree, spec: Dictionary) -> Dictionary:
 	root.rows = rows
 	tree.root.add_child(root)
 
-	var ts := load(TILESET) as TileSet
+	var ts := load(spec.get("tileset", TILESET)) as TileSet
 	var ground := TileMapLayer.new()
 	ground.name = "Ground"
 	ground.tile_set = ts
@@ -178,6 +233,75 @@ static func build_room(tree: SceneTree, spec: Dictionary) -> Dictionary:
 	front.z_index = 2
 	front.material = TerrainTools.make_front_material()
 	_add(root, front, root)
+
+	# --- capas de terreno DETRÁS del suelo (se ven más lejos y oscuras, pero tienen colisión: se pueden subir) ---
+	if spec.has("back") or spec.has("platforms_back"):
+		var back := TileMapLayer.new()
+		back.name = "GroundBack"
+		back.tile_set = ts
+		back.z_index = BACK_Z
+		back.modulate = BACK_TINT
+		_add(root, back, root)
+		var back_tips := TileMapLayer.new()
+		back_tips.name = "GrassTipsBack"
+		back_tips.tile_set = ts
+		back_tips.z_index = BACK_Z
+		back_tips.modulate = BACK_TINT
+		_add(root, back_tips, root)
+		var back_cells: Array[Vector2i] = []
+		var back_slopes: Array = []
+		var back_tops := {}  # columna -> fila de la superficie del saliente
+		for b in spec.get("back", []):
+			var bp := TerrainShapes.profile(int(b.x0), int(b.row0), b.segs, int(b.bottom))
+			back_cells.append_array(bp.cells)
+			back_slopes.append_array(bp.slopes)
+			for c in bp.cells:
+				back_tops[c.x] = mini(back_tops.get(c.x, 9999), c.y)
+		if not back_cells.is_empty():
+			TerrainTools.paint(back, back_tips, back_cells, back_slopes)
+		# Solo visual: si tuviera colisión sería una pared sólida donde los enemigos nacen y el jugador camina.
+		back.collision_enabled = false
+		# La parte superior de cada saliente sí se pisa, pero de una sola vía: se sube saltando desde abajo
+		# y se pasa de largo por delante.
+		var ledges := Node2D.new()
+		ledges.name = "BackLedges"
+		_add(root, ledges, root)
+		var col_list: Array = back_tops.keys()
+		col_list.sort()
+		var ci := 0
+		var li := 0
+		while ci < col_list.size():
+			var c0: int = col_list[ci]
+			var row: int = back_tops[c0]
+			var c1 := c0
+			while ci + 1 < col_list.size() and col_list[ci + 1] == c1 + 1 and back_tops[col_list[ci + 1]] == row:
+				ci += 1
+				c1 = col_list[ci]
+			var body := StaticBody2D.new()
+			body.name = "Ledge%d" % li
+			var cs := CollisionShape2D.new()
+			var rect := RectangleShape2D.new()
+			rect.size = Vector2((c1 - c0 + 1) * TILE, 6)
+			cs.shape = rect
+			cs.one_way_collision = true
+			cs.position = Vector2((c0 + (c1 - c0 + 1) * 0.5) * TILE, row * TILE + 3)
+			_add(ledges, body, root)
+			_add(body, cs, root)
+			li += 1
+			ci += 1
+		var pb: Array[Vector2i] = []
+		for pl in spec.get("platforms_back", []):
+			for px in range(pl[0], pl[0] + pl[2]):
+				for py in range(pl[1], pl[1] + pl[3]):
+					pb.append(Vector2i(px, py))
+		if not pb.is_empty():
+			var back_plat := TileMapLayer.new()
+			back_plat.name = "PlatformsBack"
+			back_plat.tile_set = ts
+			back_plat.z_index = BACK_Z
+			back_plat.modulate = BACK_TINT
+			_add(root, back_plat, root)
+			back_plat.set_cells_terrain_connect(pb, 0, 1, false)
 
 	# --- terreno ---
 	var cells: Array[Vector2i] = []
@@ -261,6 +385,22 @@ static func build_room(tree: SceneTree, spec: Dictionary) -> Dictionary:
 
 	# --- enemigos (en el nodo Enemies; nombres únicos por sala: los usa World para recordar los vencidos) ---
 	var enemies_spec: Array = spec.get("enemies", [])
+	# Ritmo del juego: tipos y cantidad permitidos por zona (scripts/enemy_zones.gd, docs/ENEMIGOS.md).
+	var zone_kinds: Array = []
+	var zone_xs: Array = []
+	for e in enemies_spec:
+		zone_kinds.append(e.k)
+		zone_xs.append(e.x)
+	var zone_spawns: Array = spec.spawns.values()
+	var zone_problems := EnemyZones.check(spec.id, zone_kinds, zone_xs, zone_spawns)
+	# Un enemigo bajo una plataforma trasera se ve "enterrado" dentro de ella.
+	for e in enemies_spec:
+		for pl in spec.get("platforms_back", []):
+			if int(e.x) >= int(pl[0]) - 1 and int(e.x) <= int(pl[0]) + int(pl[2]) and \
+					surface_at(surf, int(e.x)) - int(pl[1]) <= 5 and not e.has("air"):
+				zone_problems.append("%s x=%d queda bajo una plataforma trasera" % [e.k, e.x])
+	for p in zone_problems:
+		push_warning("Sala %s: %s" % [spec.id, p])
 	if not enemies_spec.is_empty():
 		var holder := Node2D.new()
 		holder.name = "Enemies"
@@ -270,6 +410,8 @@ static func build_room(tree: SceneTree, spec: Dictionary) -> Dictionary:
 			var inst := (load(ENEMY_SCENES[e.k]) as PackedScene).instantiate() as Node2D
 			counts[e.k] = counts.get(e.k, 0) + 1
 			inst.name = "%s%d" % [e.k, counts[e.k]]
+			if e.has("range"):
+				inst.set("patrol_radius", float(e.range) * TILE)  # zona de patrulla propia (en tiles)
 			var srow: int = e.get("row", surface_at(surf, int(e.x)))
 			inst.position = Vector2(int(e.x) * TILE + 8, (srow - int(e.get("air", 0))) * TILE - 2)
 			_add(holder, inst, root)
@@ -289,6 +431,8 @@ static func build_room(tree: SceneTree, spec: Dictionary) -> Dictionary:
 		count += _decorate(decor, root, solid, surf, cols, rng, avoid, count)
 
 	count += _build_props(root, spec, surf)
+	if spec.get("bg", false):
+		_build_background(root)
 
 	var ps := PackedScene.new()
 	var pack_err := ps.pack(root)
@@ -296,10 +440,32 @@ static func build_room(tree: SceneTree, spec: Dictionary) -> Dictionary:
 	var save_err := ResourceSaver.save(ps, path)
 	var used := ground.get_used_cells().size()
 	root.queue_free()
-	return {"path": path, "pack_err": pack_err, "save_err": save_err, "tiles": used, "decor": count}
+	return {"path": path, "pack_err": pack_err, "save_err": save_err, "tiles": used, "decor": count,
+			"zone_problems": zone_problems}
 
 
-const TREE_SHEET := "res://art/Decorations/Trees/Trees TileSet.png"
+## ¿Es plano el suelo bajo el rango [x0, x1] (px)? Misma altura en todas las columnas y sin tiles de pendiente.
+static func _flat_under(ground: TileMapLayer, surf: Array, x0: float, x1: float) -> bool:
+	var c0 := floori(x0 / TILE)
+	var c1 := floori(x1 / TILE)
+	var row: int = surface_at(surf, c0)
+	for c in range(c0, c1 + 1):
+		if c < 0 or c >= surf.size() or surf[c] != row:
+			return false
+		var atlas := ground.get_cell_atlas_coords(Vector2i(c, row))
+		if atlas.x >= 8:
+			return false
+	return true
+
+
+static func _overlaps(taken: Array, x0: float, x1: float) -> bool:
+	for t in taken:
+		if x1 > t[0] and x0 < t[1]:
+			return true
+	return false
+
+
+const TREE_SHEET :="res://art/Decorations/Trees/Trees TileSet.png"
 ## [y, alto] de cada fila del atlas de árboles (4 columnas de 96 px = 4 colores).
 const TREES := {"willow_s": [4, 93], "willow_l": [98, 126], "round_m": [224, 98],
 		"round_l": [322, 128], "pine_s": [452, 94], "pine_l": [548, 124]}
@@ -321,6 +487,15 @@ static func _build_props(root: Node, spec: Dictionary, surf: Array) -> int:
 		layers[l] = n
 	var cache := {}
 	var i := 0
+	var ground := root.get_node_or_null("Ground") as TileMapLayer
+	var taken: Array = []  # [x0, x1] en px de los props ya colocados (capas m y f)
+	# Zonas bajo plataformas traseras (hasta 5 tiles por encima del suelo): ahí un prop de suelo se ve
+	# "enterrado" dentro de la plataforma, así que se evita.
+	var back_zones: Array = []
+	for pl in spec.get("platforms_back", []):
+		var gy: int = surface_at(surf, int(pl[0]) + int(pl[2]) / 2)
+		if gy - int(pl[1]) <= 5:
+			back_zones.append([pl[0] * TILE - 4.0, (pl[0] + pl[2]) * TILE + 4.0])
 	for p in props:
 		var path: String = TREE_SHEET if p.has("tree") else DECOR_DIR + String(p.f) + ".png"
 		var tex := load(path) as Texture2D
@@ -344,13 +519,95 @@ static func _build_props(root: Node, spec: Dictionary, surf: Array) -> int:
 		spr.centered = false
 		spr.offset = Vector2(-used.size.x * 0.5, -used.size.y)
 		spr.flip_h = p.get("flip", false)
-		var row: int = p.get("row", surface_at(surf, int(p.x)))
-		spr.position = Vector2(float(p.x) * TILE + 8, row * TILE + 3 + float(p.get("dy", 0)))
+		var px: float = float(p.x)
+		if not p.has("row") and ground != null:
+			# Árboles: solo importa que el tronco (centro) esté en plano; el resto: todo el ancho.
+			var hw := minf(used.size.x * 0.5, 14.0) if p.has("tree") else used.size.x * 0.5
+			var is_bg: bool = p.get("l", "m") == "b"
+			var found := false
+			for step in range(0, 13):  # como mucho 6 tiles de desplazamiento
+				for dir in ([1, -1] if step > 0 else [1]):
+					var cand: float = float(p.x) + dir * step * 0.5
+					var cx: float = cand * TILE + 8.0
+					if not _flat_under(ground, surf, cx - hw, cx + hw):
+						continue
+					if not is_bg and _overlaps(back_zones, cx - hw, cx + hw):
+						continue
+					if not is_bg and step > 0 and _overlaps(taken, cx - hw - 4.0, cx + hw + 4.0):
+						continue
+					if step > 0:
+						print("Prop %s movido de x=%.1f a x=%.1f (suelo plano)" % [spr.name, px, cand])
+					px = cand
+					found = true
+					break
+				if found:
+					break
+			if not found:
+				push_warning("Prop %s en x=%.1f: no hay suelo plano cerca." % [spr.name, px])
+				if not is_bg and _overlaps(back_zones, px * TILE + 8.0 - hw, px * TILE + 8.0 + hw):
+					push_warning("Prop %s omitido: quedaría bajo una plataforma trasera." % spr.name)
+					spr.free()
+					continue
+			if not is_bg:
+				taken.append([px * TILE + 8.0 - hw, px * TILE + 8.0 + hw])
+		var row: int = p.get("row", surface_at(surf, int(px)))
+		spr.position = Vector2(px * TILE + 8, row * TILE + 3 + float(p.get("dy", 0)))
 		if p.has("tint"):
 			spr.modulate = p.tint
 		_add(layers[p.get("l", "m")], spr, root)
 		i += 1
 	return i
+
+
+const BG_DIR := "res://art/Background/Forest/"
+
+
+## Fondo en capas (parallax): nubes lejanas y dos filas de colinas boscosas (BG01), una más clara y lejana.
+## Las capas van ancladas a la pantalla (motion_scale.y = 0) y se repiten en horizontal.
+static func _build_background(root: Node) -> void:
+	var bg := ParallaxBackground.new()
+	bg.name = "Background"
+	bg.layer = -5
+	_add(root, bg, root)
+	# [textura, motion_scale x, y en pantalla (parte alta de la imagen), tinte, ancho]
+	var layers := [
+		["BGClouds", 0.05, 62.0, Color(1, 1, 1, 0.75), 400],
+		["BG01", 0.12, 100.0, Color(0.78, 0.9, 0.9, 0.9), 400],
+		["BG01", 0.30, 175.0, Color(1, 1, 1, 1), 400],
+	]
+	var i := 0
+	for l in layers:
+		var pl := ParallaxLayer.new()
+		pl.name = "Layer%d_%s" % [i, l[0]]
+		pl.motion_scale = Vector2(l[1], 0.0)
+		pl.motion_mirroring = Vector2(l[4], 0.0)
+		_add(bg, pl, root)
+		var spr := Sprite2D.new()
+		spr.name = "Img"
+		spr.texture = load(BG_DIR + l[0] + ".png")
+		spr.centered = false
+		spr.position = Vector2(0, l[2])
+		spr.modulate = l[3]
+		if l[0] == "BGClouds":
+			# Las nubes tienen el borde inferior cortado en seco: se desvanecen hacia abajo.
+			var sh := Shader.new()
+			sh.code = "shader_type canvas_item;\nvoid fragment() {\n\tvec4 c = texture(TEXTURE, UV);\n\tc.a *= smoothstep(1.0, 0.45, UV.y);\n\tCOLOR = c * COLOR;\n}\n"
+			var mat := ShaderMaterial.new()
+			mat.shader = sh
+			spr.material = mat
+		_add(pl, spr, root)
+		if i == layers.size() - 1:
+			# Relleno bajo las colinas cercanas (en salas altas la cámara ve más abajo que la imagen).
+			var tex := spr.texture as Texture2D
+			var img := tex.get_image()
+			var fill := ColorRect.new()
+			fill.name = "Fill"
+			fill.color = img.get_pixel(tex.get_width() / 2, tex.get_height() - 1)
+			fill.mouse_filter = Control.MOUSE_FILTER_IGNORE
+			fill.position = Vector2(0, l[2] + tex.get_height() - 1)
+			fill.size = Vector2(l[4], 200)
+			_add(pl, fill, root)
+		i += 1
 
 
 static func _add(parent: Node, child: Node, root: Node) -> void:

@@ -33,6 +33,7 @@ static func paint(ground: TileMapLayer, tips: TileMapLayer, cells: Array[Vector2
 		ground.set_cell(d, SRC, slope_tile(d, slopes))
 	_fill_under_slopes(ground, slopes, diag)
 	_place_rock_bands(ground, diag)
+	_place_underside(ground, diag, slopes)
 	_place_bridges(ground, slopes)
 	shade(ground)
 	rebuild_tips(ground, tips)
@@ -79,6 +80,18 @@ static func _place_rock_bands(ground: TileMapLayer, diag: Dictionary) -> void:
 		var a := ground.get_cell_atlas_coords(d)
 		if band.has(a):
 			ground.set_cell(below, SRC, band[a])
+
+
+## Acabado hecho a mano por el usuario en A1: bajo la franja de roca de cada diagonal (2 filas debajo de ella)
+## va una pieza de roca que sigue la pendiente, para que la masa oscura no quede cortada recta:
+## (8,4) bajo las bajadas y (11,4) bajo las subidas.
+static func _place_underside(ground: TileMapLayer, diag: Dictionary, slopes: Array) -> void:
+	for s in slopes:
+		for d in slope_cells(s.x, s.y, s.len, s.dir):
+			var c: Vector2i = d + Vector2i(0, 2)
+			if diag.has(c) or ground.get_cell_source_id(c) != SRC:
+				continue
+			ground.set_cell(c, SRC, Vector2i(8, 4) if s.dir > 0 else Vector2i(11, 4))
 
 
 static func _place_bridges(ground: TileMapLayer, slopes: Array) -> void:

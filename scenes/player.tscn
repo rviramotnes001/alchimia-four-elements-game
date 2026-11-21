@@ -6,7 +6,7 @@
 [ext_resource type="Script" uid="uid://rahdv7g5lokf" path="res://scripts/oxygen_meter.gd" id="4_dqkch"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qhqgy"]
-size = Vector2(8, 28)
+size = Vector2(14, 28)
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_g2els"]
 size = Vector2(26, 30)

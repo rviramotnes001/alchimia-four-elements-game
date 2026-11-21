@@ -71,6 +71,9 @@ func _enter_room(room_id: StringName, spawn_name: StringName) -> void:
 	current_room.apply_camera_limits(cam)
 	cam.reset_smoothing()
 	visited[room_id] = true
+	if OS.is_debug_build():
+		for problem in EnemyZones.check_room(current_room):
+			push_warning("Sala %s: %s" % [room_id, problem])
 	_track_enemies(room_id)
 	room_changed.emit(current_room)
 

@@ -64,7 +64,7 @@ func _think(delta: float) -> void:
 			if patrol_paused(delta):
 				velocity.x = 0.0
 			else:
-				if is_on_floor() and (is_on_wall() or not ground_ahead(6.0)):
+				if patrol_should_turn(6.0):
 					facing = -facing
 				velocity.x = facing * patrol_speed
 			if _cd <= 0.0 and _sees_player():
